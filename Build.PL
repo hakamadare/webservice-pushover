@@ -8,8 +8,14 @@ my $builder = Module::Build->new(
     dist_author         => 'Steve Huff <shuff@cpan.org>',
     dist_version_from   => 'lib/WebService/Pushover.pm',
     requires => {
-        'Test::More' => 0,
-        'version'    => 0,
+        'Test::More'                 => 0,
+        'version'                    => 0,
+        'DateTime'                   => 0,
+        'DateTime::Format::Strptime' => 0,
+        'Params::Validate'           => 0,
+        'Readonly'                   => 0,
+        'URI'                        => 0,
+        'WebService::Simple'         => 0
     },
     add_to_cleanup      => [ 'WebService-Pushover-*' ],
 );

@@ -3,14 +3,14 @@ use base qw( WebService::Simple );
 use warnings;
 use strict;
 
-binmode STDOUT, ":utf8";
+binmode STDOUT, ":encoding(UTF-8)";
 
 use Carp;
-use Data::Dumper;
 use DateTime;
 use DateTime::Format::Strptime;
 use Params::Validate qw( :all );
 use Readonly;
+use URI;
 
 use version; our $VERSION = qv('0.0.1');
 
@@ -115,7 +115,7 @@ sub push {
 
     my $status = $response->parse_response;
 
-    print Data::Dumper->Dump( [$status], [qw(*status)] );
+    return $status;
 }
 
 1; # Magic true value required at end of module
@@ -123,7 +123,7 @@ __END__
 
 =head1 NAME
 
-WebService::Pushover - [One line description of module's purpose here]
+WebService::Pushover - interface to Pushover API
 
 
 =head1 VERSION
@@ -135,96 +135,105 @@ This document describes WebService::Pushover version 0.0.1
 
     use WebService::Pushover;
 
-=for author to fill in:
-    Brief code example(s) here showing commonest usage(s).
-    This section will be as far as many users bother reading
-    so make it as educational and exeplary as possible.
-  
-  
+    my $push = WebService::Pushover->new
+        or die( "Unable to instantiate WebService::Pushover.\n" );
+
+    my %params = (
+        token => 'PUSHOVER API TOKEN',
+        user => 'PUSHOVER USER TOKEN',
+        message => 'test test test',
+    );
+
+    my $status = $push->push( %params );
+
 =head1 DESCRIPTION
 
-=for author to fill in:
-    Write a full description of the module and its features here.
-    Use subsections (=head2, =head3) as appropriate.
+This module provides a Perl wrapper around the Pushover
+( L<http://pushover.net> ) RESTful API.  You'll need to register with
+Pushover to obtain an API token for yourself and for your application
+before you'll be able to do anything with this module.
 
+=head1 INTERFACE
 
-=head1 INTERFACE 
+=over 4
 
-=for author to fill in:
-    Write a separate section listing the public components of the modules
-    interface. These normally consist of either subroutines that may be
-    exported, or methods that may be called on objects belonging to the
-    classes provided by the module.
+=item new()
 
+Inherited from L<WebService::Simple>, and takes all the same arguments; you
+shouldn't need to pass any under normal use.
 
-=head1 DIAGNOSTICS
+=item push(I<%params>)
 
-=for author to fill in:
-    List every single error and warning message that the module can
-    generate (even the ones that will "never happen"), with a full
-    explanation of each problem, one or more likely causes, and any
-    suggested remedies.
+I<push()> sends a message to Pushover and returns a scalar reference
+representation of the message status.  The following are valid parameters:
 
-=over
+=over 4
 
-=item C<< Error message here, perhaps with %s placeholders >>
+=item token B<REQUIRED>
 
-[Description of error here]
+The Pushover application token, obtained by registering at L<http://pushover.net/apps>.
 
-=item C<< Another error message here >>
+=item user B<REQUIRED>
 
-[Description of error here]
+The Pushover user token, obtained by registering at L<http://pushover.net>.
 
-[Et cetera, et cetera]
+=item device B<OPTIONAL>
+
+The Pushover device name; if not supplied, the message will go to all devices
+registered to the user token.
+
+=item title B<OPTIONAL>
+
+A string that will appear as the title of the message; if not supplied, the
+name of the application registered to the application token will appear.
+
+=item message B<REQUIRED>
+
+A string that will appear as the body of the message.
+
+=item timestamp B<OPTIONAL>
+
+The desired message timestamp, in Unix epoch seconds.
+
+=item priority B<OPTIONAL>
+
+Set this value to "1" to mark the message as high priority, or leave it unset
+for standard priority.
+
+=item url B<OPTIONAL>
+
+A string that will appear as an supplementary URL associated with the message.
 
 =back
 
+=back
 
-=head1 CONFIGURATION AND ENVIRONMENT
+=head1 DIAGNOSTICS
 
-=for author to fill in:
-    A full explanation of any configuration system(s) used by the
-    module, including the names and locations of any configuration
-    files, and the meaning of any environment variables or properties
-    that can be set. These descriptions must also include details of any
-    configuration language used.
-  
-WebService::Pushover requires no configuration files or environment variables.
-
+Inspect the value returned by I<push()>, which will be a Perl data structure
+parsed from the JSON response returned by the Pushover API.  Under normal
+operation it will contain one key, "status", with a value of "1"; in the event
+of an error, there will also be an "errors" key.
 
 =head1 DEPENDENCIES
 
-=for author to fill in:
-    A list of all the other modules that this module relies upon,
-    including any restrictions on versions, and an indication whether
-    the module is part of the standard Perl distribution, part of the
-    module's distribution, or must be installed separately. ]
+=over 4
 
-None.
+=item L<DateTime>
 
+=item L<DateTime::Format::Strptime>
 
-=head1 INCOMPATIBILITIES
+=item L<Params::Validate>
 
-=for author to fill in:
-    A list of any modules that this module cannot be used in conjunction
-    with. This may be due to name conflicts in the interface, or
-    competition for system or program resources, or due to internal
-    limitations of Perl (for example, many modules that use source code
-    filters are mutually incompatible).
+=item L<Readonly>
 
-None reported.
+=item L<URI>
 
+=item L<WebService::Simple>
+
+=back
 
 =head1 BUGS AND LIMITATIONS
-
-=for author to fill in:
-    A list of known problems with the module, together with some
-    indication Whether they are likely to be fixed in an upcoming
-    release. Also a list of restrictions on the features the module
-    does provide: data types that cannot be handled, performance issues
-    and the circumstances in which they may arise, practical
-    limitations on the size of data sets, special cases that are not
-    (yet) handled, etc.
 
 No bugs have been reported.
 

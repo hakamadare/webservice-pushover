@@ -1,9 +1,9 @@
 Build.PL
 Changes
-MANIFEST
-Makefile.PL
-README
 lib/WebService/Pushover.pm
+Makefile.PL
+MANIFEST
+README
 t/00.load.t
 t/perlcritic.t
 t/pod-coverage.t
