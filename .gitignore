@@ -10,6 +10,7 @@ pm_to_blib*
 WebService-Pushover-*
 cover_db
 MYMETA.*
+MANIFEST
 SIGNATURE
 test.pl
 tags
