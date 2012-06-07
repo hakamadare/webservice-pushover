@@ -70,7 +70,7 @@
 ^MANIFEST\.SKIP
 
 # Avoid archives of this distribution
-\bWebService-Pushover-[\d\.\_]+
+\bWebService-Pushover-v?[\d\.\_]+
 
 # Avoid test script
 ^test\.pl$
