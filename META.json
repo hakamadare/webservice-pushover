@@ -1,0 +1,48 @@
+{
+   "abstract" : "interface to Pushover API",
+   "author" : [
+      "Steve Huff <shuff@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.120900",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Pushover",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "Params::Validate" : "0",
+            "Readonly" : "0",
+            "Test::More" : "0",
+            "URI" : "0",
+            "WebService::Simple" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::Pushover" : {
+         "file" : "lib/WebService/Pushover.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.0.1"
+}
