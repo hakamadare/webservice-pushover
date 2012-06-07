@@ -1,20 +1,122 @@
 package WebService::Pushover;
-
+use base qw( WebService::Simple );
 use warnings;
 use strict;
+
+binmode STDOUT, ":utf8";
+
 use Carp;
+use Data::Dumper;
+use DateTime;
+use DateTime::Format::Strptime;
+use Params::Validate qw( :all );
+use Readonly;
 
-use version; $VERSION = qv('0.0.3');
-
-# Other recommended modules (uncomment to use):
-#  use IO::Prompt;
-#  use Perl6::Export;
-#  use Perl6::Slurp;
-#  use Perl6::Say;
-
+use version; our $VERSION = qv('0.0.1');
 
 # Module implementation here
 
+# constants
+Readonly my $REGEX_TOKEN => '^[A-Za-z0-9]{30}$';
+Readonly my $REGEX_DEVICE => '^[A-Za-z0-9_-]{0,25}$';
+
+Readonly my $SIZE_TITLE => 50;
+Readonly my $SIZE_MESSAGE => 512;
+Readonly my $SIZE_URL => 200;
+
+Readonly my $PUSHOVER_API => {
+    json => {
+        url => "https://api.pushover.net/1/messages.json",
+        parser => "JSON",
+    },
+    xml => {
+        url => "https://api.pushover.net/1/messages.xml",
+        parser => "XML::Simple",
+    },
+};
+
+__PACKAGE__->config(
+    base_url => $PUSHOVER_API->{json}->{url},
+    response_parser => $PUSHOVER_API->{json}->{parser},
+);
+
+my %push_spec = (
+    token => {
+        type  => SCALAR,
+        regex => qr/$REGEX_TOKEN/,
+    },
+    user => {
+        type  => SCALAR,
+        regex => qr/$REGEX_TOKEN/,
+    },
+    device => {
+        optional => 1,
+        type     => SCALAR,
+        regex    => qr/$REGEX_DEVICE/,
+    },
+    title => {
+        optional  => 1,
+        type      => SCALAR,
+        callbacks => {
+            "$SIZE_TITLE characters or fewer" => sub { length( shift() ) <= $SIZE_TITLE },
+        },
+    },
+    message => {
+        type      => SCALAR,
+        callbacks => {
+            "$SIZE_MESSAGE characters or fewer" => sub { length( shift() ) <= $SIZE_MESSAGE },
+        },
+    },
+    timestamp => {
+        optional  => 1,
+        type      => SCALAR,
+        callbacks => {
+            "Unix epoch timestamp" => sub {
+                my $timestamp = shift;
+                my $strp = DateTime::Format::Strptime->new(
+                    pattern   => '%s',
+                    time_zone => "floating",
+                    on_error  => "undef",
+                );
+                defined( $strp->parse_datetime( $timestamp ) );
+            },
+        },
+    },
+    priority => {
+        optional  => 1,
+        type      => SCALAR,
+        callbacks => {
+            "1 or undefined" => sub {
+                my $priority = shift;
+                ( ! defined( $priority ) )
+                    or ( $priority == 1 );
+            },
+        },
+    },
+    url => {
+        optional  => 1,
+        type      => SCALAR,
+        callbacks => {
+            "valid URL" => sub {
+                my $url = shift;
+                my $uri = URI->new( $url );
+                defined( $uri->as_string );
+            },
+        },
+    },
+);
+
+sub push {
+    my $self = shift;
+
+    my %params = validate( @_, \%push_spec );
+
+    my $response = $self->post( \%params );
+
+    my $status = $response->parse_response;
+
+    print Data::Dumper->Dump( [$status], [qw(*status)] );
+}
 
 1; # Magic true value required at end of module
 __END__
