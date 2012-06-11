@@ -25,7 +25,6 @@
             "DateTime::Format::Strptime" : "0",
             "Params::Validate" : "0",
             "Readonly" : "0",
-            "Test::More" : "0",
             "URI" : "0",
             "WebService::Simple" : "0",
             "version" : "0"
@@ -35,14 +34,21 @@
    "provides" : {
       "WebService::Pushover" : {
          "file" : "lib/WebService/Pushover.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WebService-Pushover"
+      },
+      "homepage" : "https://github.com/hakamadare/webservice-pushover",
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "git://github.com/hakamadare/webservice-pushover.git"
+      }
    },
-   "version" : "v0.0.1"
+   "version" : "v0.0.2"
 }

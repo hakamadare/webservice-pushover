@@ -15,16 +15,18 @@ name: WebService-Pushover
 provides:
   WebService::Pushover:
     file: lib/WebService/Pushover.pm
-    version: v0.0.1
+    version: v0.0.2
 requires:
   DateTime: 0
   DateTime::Format::Strptime: 0
   Params::Validate: 0
   Readonly: 0
-  Test::More: 0
   URI: 0
   WebService::Simple: 0
   version: 0
 resources:
+  bugtracker: http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WebService-Pushover
+  homepage: https://github.com/hakamadare/webservice-pushover
   license: http://dev.perl.org/licenses/
-version: v0.0.1
+  repository: git://github.com/hakamadare/webservice-pushover.git
+version: v0.0.2
