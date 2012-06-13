@@ -2,7 +2,11 @@
 abstract: 'interface to Pushover API'
 author:
   - 'Steve Huff <shuff@cpan.org>'
-build_requires: {}
+build_requires:
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
 configure_requires:
   Module::Build: 0.38
 dynamic_config: 1
@@ -15,7 +19,7 @@ name: WebService-Pushover
 provides:
   WebService::Pushover:
     file: lib/WebService/Pushover.pm
-    version: v0.0.2
+    version: v0.0.3
 requires:
   DateTime: 0
   DateTime::Format::Strptime: 0

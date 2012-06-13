@@ -19,7 +19,7 @@ my $builder = Module::Build->new(
     configure_requires => {
         'Module::Build' => 0.38,
     },
-    test_requires => {
+    build_requires => {
         'Test::More'          => 0,
         'Test::Perl::Critic'  => 0,
         'Test::Pod::Coverage' => 1.04,
