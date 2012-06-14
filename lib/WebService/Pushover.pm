@@ -12,7 +12,7 @@ use Params::Validate qw( :all );
 use Readonly;
 use URI;
 
-use version; our $VERSION = qv('0.0.4');
+use version; our $VERSION = qv('0.0.5');
 
 # Module implementation here
 
@@ -104,6 +104,13 @@ my %push_spec = (
             },
         },
     },
+    url_title => {
+        optional  => 1,
+        type      => SCALAR,
+        callbacks => {
+            "$SIZE_TITLE characters or fewer" => sub { length( shift() ) <= $SIZE_TITLE },
+        },
+    },
 );
 
 sub push {
@@ -128,7 +135,7 @@ WebService::Pushover - interface to Pushover API
 
 =head1 VERSION
 
-This document describes WebService::Pushover version 0.0.4.
+This document describes WebService::Pushover version 0.0.5.
 
 
 =head1 SYNOPSIS
@@ -202,7 +209,11 @@ for standard priority.
 
 =item url B<OPTIONAL>
 
-A string that will appear as an supplementary URL associated with the message.
+A string that will be attached to the message as a supplementary URL.
+
+=item url_title B<OPTIONAL>
+
+A string that will be displayed as the title of any supplementary URL.
 
 =back
 

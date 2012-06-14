@@ -62,7 +62,7 @@ INTERFACE
                leave it unset for standard priority.
 
            url OPTIONAL
-               A string that will appear as the body of the message.
+               A string that will be attached to the message as a hyperlink.
 
            timestamp OPTIONAL
                The desired message timestamp, in Unix epoch seconds.
