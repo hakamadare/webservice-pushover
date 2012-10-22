@@ -1,128 +1,124 @@
 NAME
-       WebService::Pushover − interface to Pushover API
+    WebService::Pushover - interface to Pushover API
 
 VERSION
-       This document describes WebService::Pushover version 0.0.1
+    This document describes WebService::Pushover version 0.0.6.
 
 SYNOPSIS
-           use WebService::Pushover;
+        use WebService::Pushover;
 
-           my $push = WebService::Pushover−>new
-               or die( "Unable to instantiate WebService::Pushover.\n" );
+        my $push = WebService::Pushover->new
+            or die( "Unable to instantiate WebService::Pushover.\n" );
 
-           my %params = (
-               token => 'PUSHOVER API TOKEN',
-               user => 'PUSHOVER USER TOKEN',
-               message => 'test test test',
-           );
+        my %params = (
+            token => 'PUSHOVER API TOKEN',
+            user => 'PUSHOVER USER TOKEN',
+            message => 'test test test',
+        );
 
-           my $status = $push−>push( %params );
+        my $status = $push->push( %params );
 
 DESCRIPTION
-       This module provides a Perl wrapper around the Pushover (
-       <http://pushover.net> ) RESTful API.  You’ll need to register with
-       Pushover to obtain an API token for yourself and for your application
-       before you’ll be able to do anything with this module.
+    This module provides a Perl wrapper around the Pushover (
+    <http://pushover.net> ) RESTful API. You'll need to register with
+    Pushover to obtain an API token for yourself and for your application
+    before you'll be able to do anything with this module.
 
 INTERFACE
-       new()
-           Inherited from WebService::Simple, and takes all the same
-           arguments; you shouldn’t need to pass any under normal use.
+    new()
+        Inherited from WebService::Simple, and takes all the same arguments;
+        you shouldn't need to pass any under normal use.
 
-       push(%params)
-           push() sends a message to Pushover and returns a scalar reference
-           representation of the message status.  The following are valid
-           parameters:
+    push(*%params*)
+        *push()* sends a message to Pushover and returns a scalar reference
+        representation of the message status. The following are valid
+        parameters:
 
-           token REQUIRED
-               The Pushover application token, obtained by registering at
-               <http://pushover.net/apps>.
+        token REQUIRED
+            The Pushover application token, obtained by registering at
+            <http://pushover.net/apps>.
 
-           user REQUIRED
-               The Pushover user token, obtained by registering at
-               <http://pushover.net>.
+        user REQUIRED
+            The Pushover user token, obtained by registering at
+            <http://pushover.net>.
 
-           device OPTIONAL
-               The Pushover device name; if not supplied, the message will go
-               to all devices registered to the user token.
+        device OPTIONAL
+            The Pushover device name; if not supplied, the message will go
+            to all devices registered to the user token.
 
-           title OPTIONAL
-               A string that will appear as the title of the message; if not
-               supplied, the name of the application registered to the
-               application token will appear.
+        title OPTIONAL
+            A string that will appear as the title of the message; if not
+            supplied, the name of the application registered to the
+            application token will appear.
 
-           message REQUIRED
-               A string that will appear as the body of the message.
+        message REQUIRED
+            A string that will appear as the body of the message.
 
-           timestamp OPTIONAL
-               The desired message timestamp, in Unix epoch seconds.
+        timestamp OPTIONAL
+            The desired message timestamp, in Unix epoch seconds.
 
-           priority OPTIONAL
-               Set this value to "1" to mark the message as high priority, or
-               leave it unset for standard priority.
+        priority OPTIONAL
+            Set this value to "1" to mark the message as high priority, set
+            it to "-1" to mark the message as low priority, or set it to "0"
+            or leave it unset for standard priority.
 
-           url OPTIONAL
-               A string that will be attached to the message as a hyperlink.
+        url OPTIONAL
+            A string that will be attached to the message as a supplementary
+            URL.
 
-           timestamp OPTIONAL
-               The desired message timestamp, in Unix epoch seconds.
-
-           priority OPTIONAL
-               Set this value to "1" to mark the message as high priority, or
-               leave it unset for standard priority.
-
-           url OPTIONAL
-               A string that will appear as an supplementary URL associated
-               with the message.
+        url_title OPTIONAL
+            A string that will be displayed as the title of any
+            supplementary URL.
 
 DIAGNOSTICS
-       Inspect the value returned by push(), which will be a Perl data
-       structure parsed from the JSON response returned by the Pushover API.
-       Under normal operation it will contain one key, "status", with a value
-       of "1"; in the event of an error, there will also be an "errors" key.
+    Inspect the value returned by *push()*, which will be a Perl data
+    structure parsed from the JSON response returned by the Pushover API.
+    Under normal operation it will contain one key, "status", with a value
+    of "1"; in the event of an error, there will also be an "errors" key.
 
 DEPENDENCIES
-       DateTime
-       DateTime::Format::Strptime
-       Params::Validate
-       Readonly
-       URI
-       WebService::Simple
+    DateTime
+    DateTime::Format::Strptime
+    Params::Validate
+    Readonly
+    URI
+    WebService::Simple
 
 BUGS AND LIMITATIONS
-       No bugs have been reported.
+    No bugs have been reported.
 
-       Please report any bugs or feature requests to
-       "bug−webservice−pushover@rt.cpan.org", or through the web interface at
-       <http://rt.cpan.org>.
+    Please report any bugs or feature requests to
+    "bug-webservice-pushover@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
 
 AUTHOR
-       Steve Huff  "<shuff@cpan.org>"
+    Steve Huff "<shuff@cpan.org>"
 
 LICENCE AND COPYRIGHT
-       Copyright (c) 2012, Steve Huff "<shuff@cpan.org>". All rights reserved.
+    Copyright (c) 2012, Steve Huff "<shuff@cpan.org>". All rights reserved.
 
-       This module is free software; you can redistribute it and/or modify it
-       under the same terms as Perl itself. See perlartistic.
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
 
 DISCLAIMER OF WARRANTY
-       BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-       FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
-       WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
-       PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
-       EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-       WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
-       ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
-       YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
-       NECESSARY SERVICING, REPAIR, OR CORRECTION.
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
 
-       IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-       WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-       REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
-       TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
-       CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
-       SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
-       RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
-       FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
-       SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
-       DAMAGES.
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+
