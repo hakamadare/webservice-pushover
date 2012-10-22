@@ -12,7 +12,7 @@ use Params::Validate qw( :all );
 use Readonly;
 use URI;
 
-use version; our $VERSION = qv('0.0.5');
+use version; our $VERSION = qv('0.0.6');
 
 # Module implementation here
 
@@ -88,8 +88,15 @@ my %push_spec = (
         callbacks => {
             "1 or undefined" => sub {
                 my $priority = shift;
+                my( %priorities ) = (
+                    0  => 'valid',
+                    1  => 'valid',
+                    -1 => 'valid',
+                    # http://updates.pushover.net/post/33347359324/sending-quiet-messages-through-the-api
+                    #2 => 'valid',
+                );
                 ( ! defined( $priority ) )
-                    or ( $priority == 1 );
+                    or exists $priorities{$priority};
             },
         },
     },
@@ -135,7 +142,7 @@ WebService::Pushover - interface to Pushover API
 
 =head1 VERSION
 
-This document describes WebService::Pushover version 0.0.5.
+This document describes WebService::Pushover version 0.0.6.
 
 
 =head1 SYNOPSIS
@@ -204,8 +211,9 @@ The desired message timestamp, in Unix epoch seconds.
 
 =item priority B<OPTIONAL>
 
-Set this value to "1" to mark the message as high priority, or leave it unset
-for standard priority.
+Set this value to "1" to mark the message as high priority, set it to "-1" to
+mark the message as low priority, or set it to "0" or leave it unset for
+standard priority.
 
 =item url B<OPTIONAL>
 

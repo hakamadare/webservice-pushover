@@ -1,5 +1,9 @@
 Revision history for WebService-Pushover
 
+0.0.6  Mon Oct 22 17:23:21 2012
+       Added additional valid options for priority parameter.
+       http://updates.pushover.net/post/33347359324/sending-quiet-messages-through-the-api
+
 0.0.5  Thu Jun 14 17:32:56 2012
        Implemented missing url_title parameter and updated documentation (thanks Joshua!)
 
