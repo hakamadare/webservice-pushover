@@ -12,7 +12,7 @@ use Params::Validate qw( :all );
 use Readonly;
 use URI;
 
-use version; our $VERSION = qv('0.0.7');
+use version; our $VERSION = qv('0.0.8');
 
 # Module implementation here
 
@@ -175,7 +175,7 @@ WebService::Pushover - interface to Pushover API
 
 =head1 VERSION
 
-This document describes WebService::Pushover version 0.0.7.
+This document describes WebService::Pushover version 0.0.8.
 
 
 =head1 SYNOPSIS
