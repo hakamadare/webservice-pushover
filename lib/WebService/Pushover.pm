@@ -12,7 +12,7 @@ use Params::Validate qw( :all );
 use Readonly;
 use URI;
 
-use version; our $VERSION = qv('0.0.6');
+use version; our $VERSION = qv('0.0.7');
 
 # Module implementation here
 
@@ -34,13 +34,9 @@ Readonly my $PUSHOVER_API => {
         parser => "XML::Simple",
     },
 };
+Readonly my $PUSHOVER_TOKENS => "https://api.pushover.net/1/users/validate.json";
 
-__PACKAGE__->config(
-    base_url => $PUSHOVER_API->{json}->{url},
-    response_parser => $PUSHOVER_API->{json}->{parser},
-);
-
-my %push_spec = (
+Readonly my $SPECS => {
     token => {
         type  => SCALAR,
         regex => qr/$REGEX_TOKEN/,
@@ -118,12 +114,49 @@ my %push_spec = (
             "$SIZE_TITLE characters or fewer" => sub { length( shift() ) <= $SIZE_TITLE },
         },
     },
+};
+
+__PACKAGE__->config(
+    base_url => $PUSHOVER_API->{json}->{url},
+    response_parser => $PUSHOVER_API->{json}->{parser},
+);
+
+my %push_spec = (
+    token => $SPECS->{token},
+    user => $SPECS->{user},
+    device => $SPECS->{device},
+    title => $SPECS->{title},
+    message => $SPECS->{message},
+    timestamp => $SPECS->{timestamp},
+    priority => $SPECS->{priority},
+    url => $SPECS->{url},
+    url_title => $SPECS->{url_title},
 );
 
 sub push {
     my $self = shift;
 
     my %params = validate( @_, \%push_spec );
+
+    my $response = $self->post( \%params );
+
+    my $status = $response->parse_response;
+
+    return $status;
+}
+
+my %tokens_spec = (
+    token => $SPECS->{token},
+    user => $SPECS->{user},
+    device => $SPECS->{device},
+);
+
+sub tokens {
+    my $self = shift;
+
+    local $self->{base_url} = $PUSHOVER_TOKENS;
+
+    my %params = validate( @_, \%tokens_spec );
 
     my $response = $self->post( \%params );
 
@@ -142,7 +175,7 @@ WebService::Pushover - interface to Pushover API
 
 =head1 VERSION
 
-This document describes WebService::Pushover version 0.0.6.
+This document describes WebService::Pushover version 0.0.7.
 
 
 =head1 SYNOPSIS
@@ -193,8 +226,8 @@ The Pushover user token, obtained by registering at L<http://pushover.net>.
 
 =item device B<OPTIONAL>
 
-The Pushover device name; if not supplied, the message will go to all devices
-registered to the user token.
+The Pushover device name; if not supplied, the user will be validated if at
+least one device is registered to that user.
 
 =item title B<OPTIONAL>
 
@@ -222,6 +255,29 @@ A string that will be attached to the message as a supplementary URL.
 =item url_title B<OPTIONAL>
 
 A string that will be displayed as the title of any supplementary URL.
+
+=back
+
+=item tokens(I<%params>)
+
+I<tokens()> sends an application token and a user token to Pushover and
+returns a scalar reference representation of the validity of those tokens.  The
+following are valid parameters:
+
+=over 4
+
+=item token B<REQUIRED>
+
+The Pushover application token, obtained by registering at L<http://pushover.net/apps>.
+
+=item user B<REQUIRED>
+
+The Pushover user token, obtained by registering at L<http://pushover.net>.
+
+=item device B<OPTIONAL>
+
+The Pushover device name; if not supplied, the message will go to all devices
+registered to the user token.
 
 =back
 
