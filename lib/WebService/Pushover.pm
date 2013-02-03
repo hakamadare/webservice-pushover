@@ -103,7 +103,7 @@ Readonly my $SPECS => {
             "valid URL" => sub {
                 my $url = shift;
                 my $uri = URI->new( $url );
-                defined( $uri->as_string );
+                defined( $uri->as_string() );
             },
         },
     },
@@ -140,7 +140,7 @@ sub push {
 
     my $response = $self->post( \%params );
 
-    my $status = $response->parse_response;
+    my $status = $response->parse_response();
 
     return $status;
 }
@@ -160,7 +160,7 @@ sub tokens {
 
     my $response = $self->post( \%params );
 
-    my $status = $response->parse_response;
+    my $status = $response->parse_response();
 
     return $status;
 }
