@@ -1,13 +1,15 @@
+use 5.006;
 use strict;
 use warnings;
 use Module::Build;
 
 my $builder = Module::Build->new(
-    module_name         => 'WebService::Pushover',
-    license             => 'perl',
-    dist_author         => 'Steve Huff <shuff@cpan.org>',
-    dist_version_from   => 'lib/WebService/Pushover.pm',
+    module_name       => 'WebService::Pushover',
+    license           => 'perl',
+    dist_author       => 'Steve Huff <shuff@cpan.org>',
+    dist_version_from => 'lib/WebService/Pushover.pm',
     requires => {
+        'perl'                       => 5.006,
         'version'                    => 0,
         'DateTime'                   => 0,
         'DateTime::Format::Strptime' => 0,
@@ -32,7 +34,8 @@ my $builder = Module::Build->new(
             repository => 'git://github.com/hakamadare/webservice-pushover.git',
         },
     },
-    add_to_cleanup      => [ 'WebService-Pushover-*' ],
+    add_to_cleanup     => [ 'WebService-Pushover-*' ],
+    create_makefile_pl => 'traditional',
 );
 
 $builder->create_build_script();
