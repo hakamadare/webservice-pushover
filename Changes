@@ -1,5 +1,9 @@
 Revision history for WebService-Pushover
 
+0.1.0  Sun Apr 14 18:31:28 2013
+       Rewrote using Net::HTTP::Spore instead of WebService::Simple.
+       Added various new methods and parameters.
+
 0.0.6  Mon Oct 22 17:23:21 2012
        Added additional valid options for priority parameter.
        http://updates.pushover.net/post/33347359324/sending-quiet-messages-through-the-api

@@ -8,11 +8,9 @@ use Carp;
 use DateTime;
 use DateTime::Format::Strptime;
 use File::Spec;
-use Mozilla::CA;
 use Net::HTTP::Spore;
 use Params::Validate qw( :all );
 use Readonly;
-use Try::Tiny;
 use URI;
 
 use version; our $VERSION = qv('0.1.0');
@@ -270,7 +268,7 @@ WebService::Pushover - interface to Pushover API
 
 =head1 VERSION
 
-This document describes WebService::Pushover version 0.0.8.
+This document describes WebService::Pushover version 0.1.0.
 
 
 =head1 SYNOPSIS
@@ -301,12 +299,12 @@ before you'll be able to do anything with this module.
 
 =item new()
 
-Inherited from L<WebService::Simple>, and takes all the same arguments; you
-shouldn't need to pass any under normal use.
+Accepts a single parameter, C<debug>.  Set this to a true value in order to
+enable tracing of L<Net::HTTP::Spore> operations.
 
-=item push(I<%params>)
+=item message(I<%params>)
 
-I<push()> sends a message to Pushover and returns a scalar reference
+I<message()> sends a message to Pushover and returns a scalar reference
 representation of the message status.  The following are valid parameters:
 
 =over 4
@@ -343,6 +341,18 @@ Set this value to "2" to mark the message as emergency priority, "1" to mark
 the message as high priority, set it to "-1" to mark the message as low
 priority, or set it to "0" or leave it unset for standard priority.
 
+=item retry B<OPTIONAL>
+
+You must pass this parameter when sending messages at emergency priority.  Set
+this value to the number of seconds before Pushover tries again to obtain
+confirmation of message receipt.
+
+=item expire B<OPTIONAL>
+
+You must pass this parameter when sending messages at emergency priority.  Set
+this value to the number of seconds before Pushover stops trying to obtain
+confirmation of message receipt.
+
 =item url B<OPTIONAL>
 
 A string that will be attached to the message as a supplementary URL.
@@ -351,11 +361,16 @@ A string that will be attached to the message as a supplementary URL.
 
 A string that will be displayed as the title of any supplementary URL.
 
+=item sound B<OPTIONAL>
+
+Select a sound to be associated with this notification.  Check the Pushover API
+documentation for valid values.
+
 =back
 
-=item tokens(I<%params>)
+=item user(I<%params>)
 
-I<tokens()> sends an application token and a user token to Pushover and
+I<user()> sends an application token and a user token to Pushover and
 returns a scalar reference representation of the validity of those tokens.  The
 following are valid parameters:
 
@@ -376,14 +391,31 @@ registered to the user token.
 
 =back
 
+=item receipt(I<%params>)
+
+I<receipt()> sends an application token and a receipt token to Pushover and
+returns a scalar reference representation of the confirmation status of the
+notification associated with the receipt.  The following are valid parameters:
+
+=over 4
+
+=item token B<REQUIRED>
+
+The Pushover application token, obtained by registering at L<http://pushover.net/apps>.
+
+=item receipt B<REQUIRED>
+
+The Pushover receipt token, obtained by parsing the output returned after
+sending a message with emergency priority.
+
+=back
+
 =back
 
 =head1 DIAGNOSTICS
 
-Inspect the value returned by I<push()>, which will be a Perl data structure
-parsed from the JSON response returned by the Pushover API.  Under normal
-operation it will contain one key, "status", with a value of "1"; in the event
-of an error, there will also be an "errors" key.
+Inspect the value returned by any method, which will be a Perl data structure
+parsed from the JSON or XML response returned by the Pushover API.
 
 =head1 DEPENDENCIES
 
@@ -393,13 +425,15 @@ of an error, there will also be an "errors" key.
 
 =item L<DateTime::Format::Strptime>
 
+=item L<Moo>
+
+=item L<Net::HTTP::Spore>
+
 =item L<Params::Validate>
 
 =item L<Readonly>
 
 =item L<URI>
-
-=item L<WebService::Simple>
 
 =back
 
@@ -411,11 +445,9 @@ Please report any bugs or feature requests to
 C<bug-webservice-pushover@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org>.
 
-
 =head1 AUTHOR
 
 Steve Huff  C<< <shuff@cpan.org> >>
-
 
 =head1 LICENCE AND COPYRIGHT
 
@@ -423,7 +455,6 @@ Copyright (c) 2012, Steve Huff C<< <shuff@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
-
 
 =head1 DISCLAIMER OF WARRANTY
 

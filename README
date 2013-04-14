@@ -2,7 +2,7 @@ NAME
     WebService::Pushover - interface to Pushover API
 
 VERSION
-    This document describes WebService::Pushover version 0.0.8.
+    This document describes WebService::Pushover version 0.1.0.
 
 SYNOPSIS
         use WebService::Pushover;
@@ -26,13 +26,13 @@ DESCRIPTION
 
 INTERFACE
     new()
-        Inherited from WebService::Simple, and takes all the same arguments;
-        you shouldn't need to pass any under normal use.
+        Accepts a single parameter, "debug". Set this to a true value in
+        order to enable tracing of Net::HTTP::Spore operations.
 
-    push(*%params*)
-        *push()* sends a message to Pushover and returns a scalar reference
-        representation of the message status. The following are valid
-        parameters:
+    message(*%params*)
+        *message()* sends a message to Pushover and returns a scalar
+        reference representation of the message status. The following are
+        valid parameters:
 
         token REQUIRED
             The Pushover application token, obtained by registering at
@@ -58,9 +58,20 @@ INTERFACE
             The desired message timestamp, in Unix epoch seconds.
 
         priority OPTIONAL
-            Set this value to "1" to mark the message as high priority, set
-            it to "-1" to mark the message as low priority, or set it to "0"
-            or leave it unset for standard priority.
+            Set this value to "2" to mark the message as emergency priority,
+            "1" to mark the message as high priority, set it to "-1" to mark
+            the message as low priority, or set it to "0" or leave it unset
+            for standard priority.
+
+        retry OPTIONAL
+            You must pass this parameter when sending messages at emergency
+            priority. Set this value to the number of seconds before
+            Pushover tries again to obtain confirmation of message receipt.
+
+        expire OPTIONAL
+            You must pass this parameter when sending messages at emergency
+            priority. Set this value to the number of seconds before
+            Pushover stops trying to obtain confirmation of message receipt.
 
         url OPTIONAL
             A string that will be attached to the message as a supplementary
@@ -70,10 +81,14 @@ INTERFACE
             A string that will be displayed as the title of any
             supplementary URL.
 
-    tokens(*%params*)
-        *tokens()* sends an application token and a user token to Pushover
-        and returns a scalar reference representation of the validity of
-        those tokens. The following are valid parameters:
+        sound OPTIONAL
+            Select a sound to be associated with this notification. Check
+            the Pushover API documentation for valid values.
+
+    user(*%params*)
+        *user()* sends an application token and a user token to Pushover and
+        returns a scalar reference representation of the validity of those
+        tokens. The following are valid parameters:
 
         token REQUIRED
             The Pushover application token, obtained by registering at
@@ -87,19 +102,33 @@ INTERFACE
             The Pushover device name; if not supplied, the message will go
             to all devices registered to the user token.
 
+    receipt(*%params*)
+        *receipt()* sends an application token and a receipt token to
+        Pushover and returns a scalar reference representation of the
+        confirmation status of the notification associated with the receipt.
+        The following are valid parameters:
+
+        token REQUIRED
+            The Pushover application token, obtained by registering at
+            <http://pushover.net/apps>.
+
+        receipt REQUIRED
+            The Pushover receipt token, obtained by parsing the output
+            returned after sending a message with emergency priority.
+
 DIAGNOSTICS
-    Inspect the value returned by *push()*, which will be a Perl data
-    structure parsed from the JSON response returned by the Pushover API.
-    Under normal operation it will contain one key, "status", with a value
-    of "1"; in the event of an error, there will also be an "errors" key.
+    Inspect the value returned by any method, which will be a Perl data
+    structure parsed from the JSON or XML response returned by the Pushover
+    API.
 
 DEPENDENCIES
     DateTime
     DateTime::Format::Strptime
+    Moo
+    Net::HTTP::Spore
     Params::Validate
     Readonly
     URI
-    WebService::Simple
 
 BUGS AND LIMITATIONS
     No bugs have been reported.

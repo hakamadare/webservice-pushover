@@ -9,14 +9,16 @@ my $builder = Module::Build->new(
     dist_author       => 'Steve Huff <shuff@cpan.org>',
     dist_version_from => 'lib/WebService/Pushover.pm',
     requires => {
-        'perl'                       => 5.006,
+        'perl'                       => 5.008,
         'version'                    => 0,
         'DateTime'                   => 0,
         'DateTime::Format::Strptime' => 0,
+        'File::Spec'                 => 0,
+        'Moo'                        => 0,
+        'Net::HTTP::Spore'           => 0,
         'Params::Validate'           => 0,
         'Readonly'                   => 0,
         'URI'                        => 0,
-        'WebService::Simple'         => 0
     },
     configure_requires => {
         'Module::Build' => 0.38,
@@ -38,4 +40,5 @@ my $builder = Module::Build->new(
     create_makefile_pl => 'traditional',
 );
 
+$builder->add_build_element('json');
 $builder->create_build_script();
