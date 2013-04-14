@@ -284,7 +284,7 @@ This document describes WebService::Pushover version 0.1.0.
         message => 'test test test',
     );
 
-    my $status = $push->push( %params );
+    my $status = $push->message( %params );
 
 =head1 DESCRIPTION
 

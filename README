@@ -16,7 +16,7 @@ SYNOPSIS
             message => 'test test test',
         );
 
-        my $status = $push->push( %params );
+        my $status = $push->message( %params );
 
 DESCRIPTION
     This module provides a Perl wrapper around the Pushover (
