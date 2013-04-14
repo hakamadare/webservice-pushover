@@ -1,168 +1,263 @@
 package WebService::Pushover;
-use base qw( WebService::Simple );
-use warnings;
-use strict;
+use Moo;
+no strict 'refs';
 
 binmode STDOUT, ":encoding(UTF-8)";
 
 use Carp;
 use DateTime;
 use DateTime::Format::Strptime;
+use File::Spec;
+use Mozilla::CA;
+use Net::HTTP::Spore;
 use Params::Validate qw( :all );
 use Readonly;
+use Try::Tiny;
 use URI;
 
-use version; our $VERSION = qv('0.0.8');
+use version; our $VERSION = qv('0.1.0');
 
 # Module implementation here
 
 # constants
+Readonly my $REGEX_FORMAT => '^(?:json|xml)$';
 Readonly my $REGEX_TOKEN => '^[A-Za-z0-9]{30}$';
 Readonly my $REGEX_DEVICE => '^[A-Za-z0-9_-]{0,25}$';
+Readonly my $REGEX_NUMERIC => '^\d+$';
+Readonly my $REGEX_SOUNDS => '^(?:pushover|bike|bugle|cashregister|classical|cosmic|falling|gamelan|incoming|intermission|magic|mechanical|pianobar|siren|spacealarm|tugboat|alien|climb|persistent|echo|updown|none)$';
 
 Readonly my $SIZE_TITLE => 50;
 Readonly my $SIZE_MESSAGE => 512;
 Readonly my $SIZE_URL => 200;
+Readonly my $SIZE_RETRY => 30;
+Readonly my $SIZE_EXPIRE => 86400;
 
-Readonly my $PUSHOVER_API => {
-    json => {
-        url => "https://api.pushover.net/1/messages.json",
-        parser => "JSON",
-    },
-    xml => {
-        url => "https://api.pushover.net/1/messages.xml",
-        parser => "XML::Simple",
-    },
-};
-Readonly my $PUSHOVER_TOKENS => "https://api.pushover.net/1/users/validate.json";
-
-Readonly my $SPECS => {
-    token => {
-        type  => SCALAR,
-        regex => qr/$REGEX_TOKEN/,
-    },
-    user => {
-        type  => SCALAR,
-        regex => qr/$REGEX_TOKEN/,
-    },
-    device => {
-        optional => 1,
-        type     => SCALAR,
-        regex    => qr/$REGEX_DEVICE/,
-    },
-    title => {
-        optional  => 1,
-        type      => SCALAR,
-        callbacks => {
-            "$SIZE_TITLE characters or fewer" => sub { length( shift() ) <= $SIZE_TITLE },
-        },
-    },
-    message => {
-        type      => SCALAR,
-        callbacks => {
-            "$SIZE_MESSAGE characters or fewer" => sub { length( shift() ) <= $SIZE_MESSAGE },
-        },
-    },
-    timestamp => {
-        optional  => 1,
-        type      => SCALAR,
-        callbacks => {
-            "Unix epoch timestamp" => sub {
-                my $timestamp = shift;
-                my $strp = DateTime::Format::Strptime->new(
-                    pattern   => '%s',
-                    time_zone => "floating",
-                    on_error  => "undef",
-                );
-                defined( $strp->parse_datetime( $timestamp ) );
-            },
-        },
-    },
-    priority => {
-        optional  => 1,
-        type      => SCALAR,
-        callbacks => {
-            "1 or undefined" => sub {
-                my $priority = shift;
-                my( %priorities ) = (
-                    0  => 'valid',
-                    1  => 'valid',
-                    -1 => 'valid',
-                    # http://updates.pushover.net/post/33347359324/sending-quiet-messages-through-the-api
-                    #2 => 'valid',
-                );
-                ( ! defined( $priority ) )
-                    or exists $priorities{$priority};
-            },
-        },
-    },
-    url => {
-        optional  => 1,
-        type      => SCALAR,
-        callbacks => {
-            "valid URL" => sub {
-                my $url = shift;
-                my $uri = URI->new( $url );
-                defined( $uri->as_string() );
-            },
-        },
-    },
-    url_title => {
-        optional  => 1,
-        type      => SCALAR,
-        callbacks => {
-            "$SIZE_TITLE characters or fewer" => sub { length( shift() ) <= $SIZE_TITLE },
-        },
-    },
-};
-
-__PACKAGE__->config(
-    base_url => $PUSHOVER_API->{json}->{url},
-    response_parser => $PUSHOVER_API->{json}->{parser},
+has debug => (
+    is => 'ro',
+    coerce => sub { $_[0] ? 1 : 0 },
 );
 
-my %push_spec = (
-    token => $SPECS->{token},
-    user => $SPECS->{user},
-    device => $SPECS->{device},
-    title => $SPECS->{title},
-    message => $SPECS->{message},
-    timestamp => $SPECS->{timestamp},
-    priority => $SPECS->{priority},
-    url => $SPECS->{url},
-    url_title => $SPECS->{url_title},
+has spore => (
+    is => 'lazy',
 );
 
-sub push {
-    my $self = shift;
-
-    my %params = validate( @_, \%push_spec );
-
-    my $response = $self->post( \%params );
-
-    my $status = $response->parse_response();
-
-    return $status;
+sub _build_spore {
+    my $self = shift();
+    my $moddir = $INC{'WebService/Pushover.pm'};
+    my( $volume, $dir, $file ) = File::Spec->splitpath( $moddir );
+    my $spec = File::Spec->catfile( $dir, 'Pushover.json' );
+    ( -r $spec )
+        or croak( "Unable to find SPORE spec: $!" );
+    my $spore = Net::HTTP::Spore->new_from_spec(
+        $spec,
+        trace => $self->debug,
+    ) or croak( "Unable to instantiate SPORE client: $!" );
+    return $spore;
 }
 
-my %tokens_spec = (
-    token => $SPECS->{token},
-    user => $SPECS->{user},
-    device => $SPECS->{device},
+has specs => (
+    is => 'lazy',
 );
 
-sub tokens {
+sub _build_specs {
+    my $self = shift();
+    my $SPECS = {
+        format => {
+            type    => SCALAR,
+            regex   => qr/$REGEX_FORMAT/,
+            default => 'json',
+        },
+        token => {
+            type  => SCALAR,
+            regex => qr/$REGEX_TOKEN/,
+        },
+        user => {
+            type  => SCALAR,
+            regex => qr/$REGEX_TOKEN/,
+        },
+        device => {
+            optional => 1,
+            type     => SCALAR,
+            regex    => qr/$REGEX_DEVICE/,
+        },
+        receipt => {
+            type  => SCALAR,
+            regex => qr/$REGEX_TOKEN/, # yes, receipts are formatted like tokens
+        },
+        callback => {
+            optional => 1,
+            type  => SCALAR,
+            callbacks => {
+                "valid URL" => sub {
+                    my $url = shift;
+                    my $uri = URI->new( $url );
+                    defined( $uri->as_string() );
+                },
+            },
+        },
+        title => {
+            optional  => 1,
+            type      => SCALAR,
+            callbacks => {
+                "$SIZE_TITLE characters or fewer" => sub { length( shift() ) <= $SIZE_TITLE },
+            },
+        },
+        message => {
+            type      => SCALAR,
+            callbacks => {
+                "$SIZE_MESSAGE characters or fewer" => sub { length( shift() ) <= $SIZE_MESSAGE },
+            },
+        },
+        timestamp => {
+            optional  => 1,
+            type      => SCALAR,
+            callbacks => {
+                "Unix epoch timestamp" => sub {
+                    my $timestamp = shift;
+                    my $strp = DateTime::Format::Strptime->new(
+                        pattern   => '%s',
+                        time_zone => "floating",
+                        on_error  => "undef",
+                    );
+                    defined( $strp->parse_datetime( $timestamp ) );
+                },
+            },
+        },
+        priority => {
+            optional  => 1,
+            type      => SCALAR,
+            callbacks => {
+                "valid or undefined" => sub {
+                    my $priority = shift;
+                    my( %priorities ) = (
+                        0  => 'valid',
+                        1  => 'valid',
+                        -1 => 'valid',
+                        2 => 'valid',
+                    );
+                    ( ! defined( $priority ) )
+                        or exists $priorities{$priority};
+                },
+            },
+        },
+        url => {
+            optional  => 1,
+            type      => SCALAR,
+            callbacks => {
+                "valid URL" => sub {
+                    my $url = shift;
+                    my $uri = URI->new( $url );
+                    defined( $uri->as_string() );
+                },
+            },
+        },
+        url_title => {
+            optional  => 1,
+            type      => SCALAR,
+            callbacks => {
+                "$SIZE_TITLE characters or fewer" => sub { length( shift() ) <= $SIZE_TITLE },
+            },
+        },
+        sound => {
+            optional => 1,
+            type     => SCALAR,
+            regex    => qr/$REGEX_SOUNDS/,
+        },
+        retry => {
+            optional => 1,
+            type     => SCALAR,
+            callbacks => {
+                "numeric" => sub { shift() =~ /$REGEX_NUMERIC/ },
+                "$SIZE_RETRY seconds or more" => sub { shift() >= $SIZE_RETRY },
+            }
+        },
+        expire => {
+            optional => 1,
+            type     => SCALAR,
+            callbacks => {
+                "numeric" => sub { shift() =~ /$REGEX_NUMERIC/ },
+                "$SIZE_EXPIRE seconds or fewer" => sub { shift() <= $SIZE_EXPIRE },
+            }
+        },
+    };
+
+    my %messages_spec = (
+        format => $SPECS->{format},
+        token => $SPECS->{token},
+        user => $SPECS->{user},
+        device => $SPECS->{device},
+        title => $SPECS->{title},
+        message => $SPECS->{message},
+        timestamp => $SPECS->{timestamp},
+        priority => $SPECS->{priority},
+        callback => $SPECS->{callback},
+        sound => $SPECS->{sound},
+        retry => $SPECS->{retry},
+        expire => $SPECS->{expire},
+        url => $SPECS->{url},
+        url_title => $SPECS->{url_title},
+    );
+
+    my %users_spec = (
+        format => $SPECS->{format},
+        token => $SPECS->{token},
+        user => $SPECS->{user},
+        device => $SPECS->{device},
+    );
+
+    my %receipts_spec = (
+        format => $SPECS->{format},
+        token => $SPECS->{token},
+        receipt => $SPECS->{receipt},
+    );
+
+    return {
+        messages => \%messages_spec,
+        users => \%users_spec,
+        receipts => \%receipts_spec,
+    };
+}
+
+sub _apicall {
     my $self = shift;
 
-    local $self->{base_url} = $PUSHOVER_TOKENS;
+    my $call = shift;
 
-    my %params = validate( @_, \%tokens_spec );
+    my $spec = $self->specs->{$call}
+        or croak( "'$call' is not a supported API call." );
 
-    my $response = $self->post( \%params );
+    my $params = validate( @_, $spec );
 
-    my $status = $response->parse_response();
+    my $response;
+    if ( defined( $params->{format} ) && $params->{format} eq 'json' ) {
+        $response = $self->spore->enable( 'Header', header_name => 'Content-Type', header_value => 'application/x-www-form-urlencoded' )->enable( 'Format::JSON' )->$call( %{$params} );
+    }
+    elsif ( defined( $params->{format} ) && $params->{format} eq 'xml' ){
+        $response = $self->spore->enable( 'Header', header_name => 'Content-Type', header_value => 'application/x-www-form-urlencoded' )->enable( 'Format::XML' )->$call( %{$params} );
+    }
+    else {
+        $response = $self->spore->$call( %{$params} );
+    }
 
-    return $status;
+    return $response->body;
+}
+
+sub message {
+    my $self = shift;
+
+    return $self->_apicall( 'messages', @_ );
+}
+
+sub user {
+    my $self = shift;
+
+    return $self->_apicall( 'users', @_ );
+}
+
+sub receipt {
+    my $self = shift;
+
+    return $self->_apicall( 'receipts', @_ );
 }
 
 1; # Magic true value required at end of module
@@ -244,9 +339,9 @@ The desired message timestamp, in Unix epoch seconds.
 
 =item priority B<OPTIONAL>
 
-Set this value to "1" to mark the message as high priority, set it to "-1" to
-mark the message as low priority, or set it to "0" or leave it unset for
-standard priority.
+Set this value to "2" to mark the message as emergency priority, "1" to mark
+the message as high priority, set it to "-1" to mark the message as low
+priority, or set it to "0" or leave it unset for standard priority.
 
 =item url B<OPTIONAL>
 
