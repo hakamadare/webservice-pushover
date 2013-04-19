@@ -9,11 +9,12 @@ use DateTime;
 use DateTime::Format::Strptime;
 use File::Spec;
 use Net::HTTP::Spore;
+use Net::HTTP::Spore::Middleware::Header;
 use Params::Validate qw( :all );
 use Readonly;
 use URI;
 
-use version; our $VERSION = qv('0.1.0');
+use version; our $VERSION = qv('0.1.1');
 
 # Module implementation here
 
@@ -32,6 +33,7 @@ Readonly my $SIZE_EXPIRE => 86400;
 
 has debug => (
     is => 'ro',
+    default => sub { 0 },
     coerce => sub { $_[0] ? 1 : 0 },
 );
 
@@ -268,7 +270,7 @@ WebService::Pushover - interface to Pushover API
 
 =head1 VERSION
 
-This document describes WebService::Pushover version 0.1.0.
+This document describes WebService::Pushover version 0.1.1.
 
 
 =head1 SYNOPSIS
@@ -301,6 +303,10 @@ before you'll be able to do anything with this module.
 
 Accepts a single parameter, C<debug>.  Set this to a true value in order to
 enable tracing of L<Net::HTTP::Spore> operations.
+
+=item debug()
+
+I<debug()> returns 1 if debugging is enabled, and 0 otherwise.
 
 =item message(I<%params>)
 

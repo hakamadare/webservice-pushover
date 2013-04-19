@@ -18,6 +18,7 @@ WriteMakefile
                    'File::Spec' => 0,
                    'DateTime::Format::Strptime' => 0,
                    'Readonly' => 0,
+                   'Net::HTTP::Spore::Middleware::Header' => 0,
                    'Test::Pod' => '1.14',
                    'Test::Perl::Critic' => 0,
                    'Test::More' => 0,
