@@ -2,7 +2,7 @@ NAME
     WebService::Pushover - interface to Pushover API
 
 VERSION
-    This document describes WebService::Pushover version 0.1.0.
+    This document describes WebService::Pushover version 0.1.1.
 
 SYNOPSIS
         use WebService::Pushover;
@@ -28,6 +28,9 @@ INTERFACE
     new()
         Accepts a single parameter, "debug". Set this to a true value in
         order to enable tracing of Net::HTTP::Spore operations.
+
+    debug()
+        *debug()* returns 1 if debugging is enabled, and 0 otherwise.
 
     message(*%params*)
         *message()* sends a message to Pushover and returns a scalar
