@@ -129,6 +129,7 @@ DEPENDENCIES
     DateTime::Format::Strptime
     Moo
     Net::HTTP::Spore
+    Net::HTTP::Spore::Middleware::Header
     Params::Validate
     Readonly
     URI

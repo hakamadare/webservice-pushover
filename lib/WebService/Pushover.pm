@@ -435,6 +435,8 @@ parsed from the JSON or XML response returned by the Pushover API.
 
 =item L<Net::HTTP::Spore>
 
+=item L<Net::HTTP::Spore::Middleware::Header>
+
 =item L<Params::Validate>
 
 =item L<Readonly>
