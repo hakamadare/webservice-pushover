@@ -260,6 +260,25 @@ sub receipt {
     return $self->_apicall( 'receipts', @_ );
 }
 
+# ok, add some backwards compatibility
+before 'push' => sub {
+    carp( "The 'push' method is deprecated in WebService::Pushover v0.1.0, and will be removed in a future release.  Please use the 'message' method instead." );
+};
+
+sub push {
+    my $self = shift;
+    $self->message( @_ );
+}
+
+before 'tokens' => sub {
+    carp( "The 'tokens' method is deprecated in WebService::Pushover v0.1.0, and will be removed in a future release.  Please use the 'user' method instead." );
+};
+
+sub tokens {
+    my $self = shift;
+    $self->user( @_ );
+}
+
 1; # Magic true value required at end of module
 __END__
 
@@ -374,6 +393,10 @@ documentation for valid values.
 
 =back
 
+=item push(I<%params>)
+
+I<push()> is a B<DEPRECATED> alias for I<message()>.  It will be removed in a future release, but remains for backwards compatibility.
+
 =item user(I<%params>)
 
 I<user()> sends an application token and a user token to Pushover and
@@ -396,6 +419,10 @@ The Pushover device name; if not supplied, the message will go to all devices
 registered to the user token.
 
 =back
+
+=item tokens(I<%params>)
+
+I<tokens()> is a B<DEPRECATED> alias for I<user()>.  It will be removed in a future release, but remains for backwards compatibility.
 
 =item receipt(I<%params>)
 
