@@ -2,7 +2,7 @@ NAME
     WebService::Pushover - interface to Pushover API
 
 VERSION
-    This document describes WebService::Pushover version 0.1.1.
+    This document describes WebService::Pushover version 0.1.2.
 
 SYNOPSIS
         use WebService::Pushover;
@@ -88,6 +88,10 @@ INTERFACE
             Select a sound to be associated with this notification. Check
             the Pushover API documentation for valid values.
 
+    push(*%params*)
+        *push()* is a DEPRECATED alias for *message()*. It will be removed
+        in a future release, but remains for backwards compatibility.
+
     user(*%params*)
         *user()* sends an application token and a user token to Pushover and
         returns a scalar reference representation of the validity of those
@@ -104,6 +108,10 @@ INTERFACE
         device OPTIONAL
             The Pushover device name; if not supplied, the message will go
             to all devices registered to the user token.
+
+    tokens(*%params*)
+        *tokens()* is a DEPRECATED alias for *user()*. It will be removed in
+        a future release, but remains for backwards compatibility.
 
     receipt(*%params*)
         *receipt()* sends an application token and a receipt token to
