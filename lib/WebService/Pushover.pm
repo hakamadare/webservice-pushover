@@ -14,7 +14,7 @@ use Params::Validate qw( :all );
 use Readonly;
 use URI;
 
-use version; our $VERSION = qv('0.1.2');
+use version; our $VERSION = qv('0.2.0');
 
 # Module implementation here
 
@@ -133,7 +133,7 @@ sub _build_specs {
                         0  => 'valid',
                         1  => 'valid',
                         -1 => 'valid',
-                        2 => 'valid',
+                        2  => 'valid',
                     );
                     ( ! defined( $priority ) )
                         or exists $priorities{$priority};
@@ -182,39 +182,45 @@ sub _build_specs {
     };
 
     my %messages_spec = (
-        format => $SPECS->{format},
-        token => $SPECS->{token},
-        user => $SPECS->{user},
-        device => $SPECS->{device},
-        title => $SPECS->{title},
-        message => $SPECS->{message},
+        format    => $SPECS->{format},
+        token     => $SPECS->{token},
+        user      => $SPECS->{user},
+        device    => $SPECS->{device},
+        title     => $SPECS->{title},
+        message   => $SPECS->{message},
         timestamp => $SPECS->{timestamp},
-        priority => $SPECS->{priority},
-        callback => $SPECS->{callback},
-        sound => $SPECS->{sound},
-        retry => $SPECS->{retry},
-        expire => $SPECS->{expire},
-        url => $SPECS->{url},
+        priority  => $SPECS->{priority},
+        callback  => $SPECS->{callback},
+        sound     => $SPECS->{sound},
+        retry     => $SPECS->{retry},
+        expire    => $SPECS->{expire},
+        url       => $SPECS->{url},
         url_title => $SPECS->{url_title},
     );
 
     my %users_spec = (
         format => $SPECS->{format},
-        token => $SPECS->{token},
-        user => $SPECS->{user},
+        token  => $SPECS->{token},
+        user   => $SPECS->{user},
         device => $SPECS->{device},
     );
 
     my %receipts_spec = (
-        format => $SPECS->{format},
-        token => $SPECS->{token},
+        format  => $SPECS->{format},
+        token   => $SPECS->{token},
         receipt => $SPECS->{receipt},
+    );
+
+    my %sounds_spec = (
+        format => $SPECS->{format},
+        token  => $SPECS->{token},
     );
 
     return {
         messages => \%messages_spec,
-        users => \%users_spec,
+        users    => \%users_spec,
         receipts => \%receipts_spec,
+        sounds   => \%sounds_spec,
     };
 }
 
@@ -260,6 +266,12 @@ sub receipt {
     return $self->_apicall( 'receipts', @_ );
 }
 
+sub sounds {
+    my $self = shift;
+
+    return $self->_apicall( 'sounds', @_ );
+}
+
 # ok, add some backwards compatibility
 before 'push' => sub {
     carp( "The 'push' method is deprecated in WebService::Pushover v0.1.0, and will be removed in a future release.  Please use the 'message' method instead." );
@@ -289,7 +301,7 @@ WebService::Pushover - interface to Pushover API
 
 =head1 VERSION
 
-This document describes WebService::Pushover version 0.1.2.
+This document describes WebService::Pushover version 0.2.0.
 
 
 =head1 SYNOPSIS
@@ -440,6 +452,20 @@ The Pushover application token, obtained by registering at L<http://pushover.net
 
 The Pushover receipt token, obtained by parsing the output returned after
 sending a message with emergency priority.
+
+=back
+
+=item sounds(I<%params>)
+
+I<sounds()> sends an application token to Pushover and returns a hash reference
+listing the available sounds (suitable for passing to the I<sound> parameter of
+the I<message()>.  The following are valid parameters:
+
+=over 4
+
+=item token B<REQUIRED>
+
+The Pushover application token, obtained by registering at L<http://pushover.net/apps>.
 
 =back
 
