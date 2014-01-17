@@ -1,5 +1,7 @@
 Revision history for WebService-Pushover
 
+       Moved deprecated methods out of main interface documentation.
+
 0.2.0  Fri Jan 10 10:35:18 2014
        Fix for non-creator user key issue (thanks Chisel Wright!)
        Added sounds() and bumped minor version.
