@@ -405,10 +405,6 @@ documentation for valid values.
 
 =back
 
-=item push(I<%params>)
-
-I<push()> is a B<DEPRECATED> alias for I<message()>.  It will be removed in a future release, but remains for backwards compatibility.
-
 =item user(I<%params>)
 
 I<user()> sends an application token and a user token to Pushover and
@@ -431,10 +427,6 @@ The Pushover device name; if not supplied, the message will go to all devices
 registered to the user token.
 
 =back
-
-=item tokens(I<%params>)
-
-I<tokens()> is a B<DEPRECATED> alias for I<user()>.  It will be removed in a future release, but remains for backwards compatibility.
 
 =item receipt(I<%params>)
 
@@ -468,6 +460,23 @@ the I<message()>.  The following are valid parameters:
 The Pushover application token, obtained by registering at L<http://pushover.net/apps>.
 
 =back
+
+=back
+
+=head2 DEPRECATED METHODS
+
+The following methods are depreated, and will be removed in a future
+release. They remain for now to provide backwards compatibility.
+
+=over
+
+=item push(I<%params>)
+
+I<push()> is a B<DEPRECATED> alias for I<message()>.
+
+=item tokens(I<%params>)
+
+I<tokens()> is a B<DEPRECATED> alias for I<user()>.
 
 =back
 
