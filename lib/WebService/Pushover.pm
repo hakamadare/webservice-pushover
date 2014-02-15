@@ -41,6 +41,19 @@ has spore => (
     is => 'lazy',
 );
 
+# NB: We can't call this 'user', as there's already a method called that.
+has user_token => (
+    is       => 'ro',
+    required => 0,
+    isa      => sub { $_[0] =~ /$REGEX_TOKEN/ or die "Invalid user token: $_[0]" },
+);
+
+has api_token => (
+    is       => 'ro',
+    required => 0,
+    isa      => sub { $_[0] =~ /$REGEX_TOKEN/ or die "Invalid api token: $_[0]" },
+);
+
 sub _build_spore {
     my $self = shift();
     my $moddir = $INC{'WebService/Pushover.pm'};
@@ -251,25 +264,39 @@ sub _apicall {
 sub message {
     my $self = shift;
 
-    return $self->_apicall( 'messages', @_ );
+    return $self->_apicall( 'messages',
+        user  => $self->user_token,
+        token => $self->api_token,
+        @_
+    );
 }
 
 sub user {
     my $self = shift;
 
-    return $self->_apicall( 'users', @_ );
+    return $self->_apicall( 'users', 
+        user  => $self->user_token,
+        token => $self->api_token,
+        @_
+    );
 }
 
 sub receipt {
     my $self = shift;
 
-    return $self->_apicall( 'receipts', @_ );
+    return $self->_apicall( 'receipts',
+        token => $self->api_token,
+        @_
+    );
 }
 
 sub sounds {
     my $self = shift;
 
-    return $self->_apicall( 'sounds', @_ );
+    return $self->_apicall( 'sounds',
+        token => $self->api_token,
+        @_
+    );
 }
 
 # ok, add some backwards compatibility
