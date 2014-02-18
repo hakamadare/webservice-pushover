@@ -41,6 +41,19 @@ has spore => (
     is => 'lazy',
 );
 
+# NB: We can't call this 'user', as there's already a method called that.
+has user_token => (
+    is       => 'ro',
+    required => 0,
+    isa      => sub { $_[0] =~ /$REGEX_TOKEN/ or die "Invalid user token: $_[0]" },
+);
+
+has api_token => (
+    is       => 'ro',
+    required => 0,
+    isa      => sub { $_[0] =~ /$REGEX_TOKEN/ or die "Invalid api token: $_[0]" },
+);
+
 sub _build_spore {
     my $self = shift();
     my $moddir = $INC{'WebService/Pushover.pm'};
@@ -251,25 +264,39 @@ sub _apicall {
 sub message {
     my $self = shift;
 
-    return $self->_apicall( 'messages', @_ );
+    return $self->_apicall( 'messages',
+        user  => $self->user_token,
+        token => $self->api_token,
+        @_
+    );
 }
 
 sub user {
     my $self = shift;
 
-    return $self->_apicall( 'users', @_ );
+    return $self->_apicall( 'users', 
+        user  => $self->user_token,
+        token => $self->api_token,
+        @_
+    );
 }
 
 sub receipt {
     my $self = shift;
 
-    return $self->_apicall( 'receipts', @_ );
+    return $self->_apicall( 'receipts',
+        token => $self->api_token,
+        @_
+    );
 }
 
 sub sounds {
     my $self = shift;
 
-    return $self->_apicall( 'sounds', @_ );
+    return $self->_apicall( 'sounds',
+        token => $self->api_token,
+        @_
+    );
 }
 
 # ok, add some backwards compatibility
@@ -298,23 +325,22 @@ __END__
 
 WebService::Pushover - interface to Pushover API
 
-
 =head1 VERSION
 
 This document describes WebService::Pushover version 0.2.0.
-
 
 =head1 SYNOPSIS
 
     use WebService::Pushover;
 
-    my $push = WebService::Pushover->new
-        or die( "Unable to instantiate WebService::Pushover.\n" );
+    my $push = WebService::Pushover->new(
+        user_token => 'PUSHOVER USER TOKEN',
+        api_token  => 'PUSHOVER API TOKEN',
+    ) or die( "Unable to instantiate WebService::Pushover.\n" );
 
     my %params = (
-        token => 'PUSHOVER API TOKEN',
-        user => 'PUSHOVER USER TOKEN',
-        message => 'test test test',
+        message  => 'test test test',
+        priority => 0,
     );
 
     my $status = $push->message( %params );
@@ -330,10 +356,28 @@ before you'll be able to do anything with this module.
 
 =over 4
 
-=item new()
+=item new(I<%params>)
 
-Accepts a single parameter, C<debug>.  Set this to a true value in order to
-enable tracing of L<Net::HTTP::Spore> operations.
+Creates an object that allows for interaction with Pushover. The following
+are valid arguments; all are optional:
+
+=over 4
+
+=item debug B<OPTIONAL>
+
+Set this to a true value in order to enable tracing of L<Net::HTTP::Spore> operations.
+
+=item user_token B<OPTIONAL>
+
+The Pushover user token, obtained by registering at L<http://pushover.net>.
+If specified, will be used as a default in any call that requires a user token.
+
+=item api_token B<OPTIONAL>
+
+The Pushover application token, obtained by registering at L<http://pushover.net/apps>.
+If specified, will be used as a default in any call that requires an API token.
+
+=back
 
 =item debug()
 
@@ -346,13 +390,15 @@ representation of the message status.  The following are valid parameters:
 
 =over 4
 
-=item token B<REQUIRED>
+=item token B<OPTIONAL>
 
-The Pushover application token, obtained by registering at L<http://pushover.net/apps>.
+The Pushover application token.
+If not specified, the C<api_token> specified in C<new> will be used.
 
-=item user B<REQUIRED>
+=item user B<OPTIONAL>
 
-The Pushover user token, obtained by registering at L<http://pushover.net>.
+The Pushover user token.
+If not specified, the C<user_token> specified in C<new> will be used.
 
 =item device B<OPTIONAL>
 
@@ -413,13 +459,15 @@ following are valid parameters:
 
 =over 4
 
-=item token B<REQUIRED>
+=item token B<OPTIONAL>
 
-The Pushover application token, obtained by registering at L<http://pushover.net/apps>.
+The Pushover application token.
+If not specified, the C<api_token> specified in C<new> will be used.
 
-=item user B<REQUIRED>
+=item user B<OPTIONAL>
 
-The Pushover user token, obtained by registering at L<http://pushover.net>.
+The Pushover user token.
+If not specified, the C<user_token> specified in C<new> will be used.
 
 =item device B<OPTIONAL>
 
@@ -436,9 +484,10 @@ notification associated with the receipt.  The following are valid parameters:
 
 =over 4
 
-=item token B<REQUIRED>
+=item token B<OPTIONAL>
 
-The Pushover application token, obtained by registering at L<http://pushover.net/apps>.
+The Pushover application token.
+If not specified, the C<api_token> specified in C<new> will be used.
 
 =item receipt B<REQUIRED>
 
@@ -455,9 +504,10 @@ the I<message()>.  The following are valid parameters:
 
 =over 4
 
-=item token B<REQUIRED>
+=item token B<OPTIONAL>
 
-The Pushover application token, obtained by registering at L<http://pushover.net/apps>.
+The Pushover application token.
+If not specified, the C<api_token> specified in C<new> will be used.
 
 =back
 
