@@ -2,7 +2,7 @@
    "name" : "Pushover",
    "authority" : "GITHUB:hakamadare",
    "version" : "1.0",
-   "base_url" : "https://api.pushover.net/1",
+   "base_url" : "https://api.pushover.net",
    "formats" : [
       "json",
       "xml"
@@ -27,7 +27,7 @@
             "sound"
          ],
          "method" : "POST",
-         "path" : "/messages.:format",
+         "path" : "/1/messages.:format",
          "required_params" : [
             "token",
             "user",
@@ -35,7 +35,6 @@
          ]
       },
       "users" : {
-         "base_url": "https://api.pushover.net/1",
          "formats" : [
              "json"
          ],
@@ -48,14 +47,13 @@
             "device"
          ],
          "method" : "POST",
-         "path" : "/users/validate.:format",
+         "path" : "/1/users/validate.:format",
          "required_params" : [
             "token",
             "user"
          ]
       },
       "receipts" : {
-         "base_url": "https://api.pushover.net/1",
          "formats" : [
              "json"
          ],
@@ -65,14 +63,13 @@
             "404"
          ],
          "method" : "GET",
-         "path" : "/receipts/:receipt.:format",
+         "path" : "/1/receipts/:receipt.:format",
          "required_params" : [
             "receipt",
             "token"
          ]
       },
       "sounds" : {
-         "base_url": "https://api.pushover.net/1",
          "formats" : [
              "json"
          ],
@@ -82,7 +79,7 @@
             "404"
          ],
          "method" : "GET",
-         "path" : "/sounds.:format",
+         "path" : "/1/sounds.:format",
          "required_params" : [
             "token"
          ]
