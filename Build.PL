@@ -25,6 +25,9 @@ my $builder = Module::Build->new(
         'Module::Build' => 0.38,
     },
     build_requires => {
+        'JSON'                => 0,
+        'Test::Deep'          => 0,
+        'Test::Fake::HTTP'    => 0,
         'Test::More'          => 0,
         'Test::Perl::Critic'  => 0,
         'Test::Pod::Coverage' => 1.04,
