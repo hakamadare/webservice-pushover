@@ -23,7 +23,7 @@ cmp_deeply($res, superhashof({ status => 1 }), "Basic message() call succeeded")
 	or diag explain $res;
 
 $res = $api->message(
-	message   => "Test advanced message",
+	message   => q|test message: abcdefghijklmnopqrstuvwxyz01234567889!@#$%^&*()-=_+`~[]\\{}\|;:'"/?.><|,
 	sound     => "bike",
 	timestamp => 42,
 	priority  => 2,

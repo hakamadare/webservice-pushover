@@ -27,7 +27,7 @@ pushover_ok 'message', {
 	headers => ignore,
 	path    => '/1/messages.json',
 	data    => {
-		message => 'test%20message',
+		message => 'test+message',
 		user    => $user,
 		token   => $token,
 	},
@@ -39,24 +39,21 @@ pushover_ok 'message', {
 	headers => ignore,
 	path    => '/1/messages.json',
 	data    => {
-		message => 'test%20message',
+		message => 'test+message',
 		user    => $USER_TOKEN,
 		token   => $API_TOKEN,
 	},
 }, "passing no token/user to message() uses built-ins";
 
-TODO: {
-	local $TODO = "Need to fix message truncation";
-	pushover_ok 'message', {
-		message => q|abcdefghijklmnopqrstuvwxyz01234567889!@#$%^&*()-=_+`~[]\\{}\|;:'"/?.><|,
-	},{
-		headers => ignore,
-		path    => '/1/messages.json',
-		data    => superhashof({
-			message => q|abcdefghijklmnopqrstuvwxyz01234567889!@#$%^*&()-=_+`~[]\\{}\|;:'"/?.><|,
-		}),
-	}, "Odd characters are escaped properly";
-};
+pushover_ok 'message', {
+	message => q|abcdefghijklmnopqrstuvwxyz01234567889!@#$%^&*()-=_+`~[]\\{}\|;:'"/?.><|,
+},{
+	headers => ignore,
+	path    => '/1/messages.json',
+	data    => superhashof({
+		message => q|abcdefghijklmnopqrstuvwxyz01234567889!%40%23%24%25%5E%26*()-%3D_%2B%60~%5B%5D%5C%7B%7D%7C%3B%3A'%22%2F%3F.%3E%3C|,
+	}),
+}, "Odd characters are escaped properly";
 
 pushover_ok 'message', {
 	message   => 'test',
@@ -81,8 +78,8 @@ pushover_ok 'message', {
 		priority  => -1,
 		retry     => 300,
 		expire    => 1,
-		callback  => 'http://asdf.com',
-		url       => 'http://perl.org',
+		callback  => 'http%3A%2F%2Fasdf.com',
+		url       => 'http%3A%2F%2Fperl.org',
 		url_title => 'Perl!',
 		sound     => 'bugle',
 		token     => $API_TOKEN,
