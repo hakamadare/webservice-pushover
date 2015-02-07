@@ -1,6 +1,7 @@
 package WebService::Pushover;
+use strict;
+
 use Moo;
-no strict 'refs';
 
 binmode STDOUT, ":encoding(UTF-8)";
 

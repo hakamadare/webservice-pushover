@@ -12,7 +12,6 @@ WriteMakefile
                    'Net::HTTP::Spore' => 0,
                    'DateTime' => 0,
                    'URI' => 0,
-                   'Test::Pod::Coverage' => '1.04',
                    'version' => 0,
                    'Moo' => 0,
                    'File::Spec' => 0,
@@ -22,8 +21,6 @@ WriteMakefile
                    'JSON'                => 0,
                    'Test::Deep'          => 0,
                    'Test::Fake::HTTP'    => 0,
-                   'Test::Pod' => '1.14',
-                   'Test::Perl::Critic' => 0,
                    'Test::More' => 0,
                    'Params::Validate' => 0
                  }

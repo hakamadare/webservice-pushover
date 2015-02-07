@@ -29,9 +29,6 @@ my $builder = Module::Build->new(
         'Test::Deep'          => 0,
         'Test::Fake::HTTPD'   => 0,
         'Test::More'          => 0,
-        'Test::Perl::Critic'  => 0,
-        'Test::Pod::Coverage' => 1.04,
-        'Test::Pod'           => 1.14,
     },
     meta_merge => {
         resources => {
