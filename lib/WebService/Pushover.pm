@@ -325,7 +325,7 @@ WebService::Pushover - interface to Pushover API
 
 =head1 VERSION
 
-This document describes WebService::Pushover version 0.2.0.
+This document describes WebService::Pushover version 1.0.0.
 
 =head1 SYNOPSIS
 
@@ -563,9 +563,7 @@ parsed from the JSON or XML response returned by the Pushover API.
 
 No bugs have been reported.
 
-Please report any bugs or feature requests to
-C<bug-webservice-pushover@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
+Please report any bugs or feature requests through the web interface at L<https://github.com/hakamadare/webservice-pushover/issues>.
 
 =head1 AUTHOR
 
