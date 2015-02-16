@@ -74,3 +74,6 @@
 
 # Avoid test script
 ^test\.pl$
+
+# Avoid merge detritus
+\.orig$
