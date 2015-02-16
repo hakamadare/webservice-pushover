@@ -1,9 +1,12 @@
 use 5.006;
 use strict;
 use warnings;
-use Module::Build;
+use Module::Build::Pluggable qw(
+    ReadmeMarkdownFromPod
+    Repository
+);
 
-my $builder = Module::Build->new(
+my $builder = Module::Build::Pluggable->new(
     module_name       => 'WebService::Pushover',
     license           => 'perl',
     dist_author       => 'Steve Huff <shuff@cpan.org>',
@@ -32,9 +35,8 @@ my $builder = Module::Build->new(
     },
     meta_merge => {
         resources => {
-            homepage   => 'https://github.com/hakamadare/webservice-pushover',
+            homepage   => 'http://github.com/hakamadare/webservice-pushover/',
             bugtracker => 'http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WebService-Pushover',
-            repository => 'git://github.com/hakamadare/webservice-pushover.git',
         },
     },
     add_to_cleanup     => [ 'WebService-Pushover-*' ],
