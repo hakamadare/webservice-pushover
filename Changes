@@ -1,5 +1,10 @@
 Revision history for WebService-Pushover
 
+1.0.0  Mon Feb 16 13:32:12 2015
+       Switched back from Net::HTTP::SPORE to WebService::Simple (thanks Geoff Franks!).
+       Fixed message truncation bug.
+       Improved unit tests.
+       Generated Markdown-formatted README.
        Moved deprecated methods out of main interface documentation.
 
 0.2.0  Fri Jan 10 10:35:18 2014
