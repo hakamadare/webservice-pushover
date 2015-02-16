@@ -9,7 +9,8 @@ WriteMakefile
   'EXE_FILES' => [],
   'VERSION_FROM' => 'lib/WebService/Pushover.pm',
   'PREREQ_PM' => {
-                   'Net::HTTP::Spore' => 0,
+                   'WebService::Simple' => 0,
+                   'WebService::Simple::Parser::JSON' => 0,
                    'DateTime' => 0,
                    'URI' => 0,
                    'Test::Pod::Coverage' => '1.04',
@@ -18,7 +19,6 @@ WriteMakefile
                    'File::Spec' => 0,
                    'DateTime::Format::Strptime' => 0,
                    'Readonly' => 0,
-                   'Net::HTTP::Spore::Middleware::Header' => 0,
                    'JSON'                => 0,
                    'Test::Deep'          => 0,
                    'Test::Fake::HTTP'    => 0,

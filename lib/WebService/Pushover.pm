@@ -8,13 +8,13 @@ use Carp;
 use DateTime;
 use DateTime::Format::Strptime;
 use File::Spec;
-use Net::HTTP::Spore;
-use Net::HTTP::Spore::Middleware::Header;
+use WebService::Simple;
+use WebService::Simple::Parser::JSON;
 use Params::Validate qw( :all );
 use Readonly;
 use URI;
 
-use version; our $VERSION = qv('0.2.1');
+use version; our $VERSION = qv('1.0.0');
 
 # Module implementation here
 
@@ -37,10 +37,6 @@ has debug => (
     coerce => sub { $_[0] ? 1 : 0 },
 );
 
-has spore => (
-    is => 'lazy',
-);
-
 # NB: We can't call this 'user', as there's already a method called that.
 has user_token => (
     is       => 'ro',
@@ -54,18 +50,34 @@ has api_token => (
     isa      => sub { $_[0] =~ /$REGEX_TOKEN/ or die "Invalid api token: $_[0]" },
 );
 
-sub _build_spore {
-    my $self = shift();
-    my $moddir = $INC{'WebService/Pushover.pm'};
-    my( $volume, $dir, $file ) = File::Spec->splitpath( $moddir );
-    my $spec = File::Spec->catfile( $dir, 'Pushover.json' );
-    ( -r $spec )
-        or croak( "Unable to find SPORE spec: $!" );
-    my $spore = Net::HTTP::Spore->new_from_spec(
-        $spec,
-        trace => $self->debug,
-    ) or croak( "Unable to instantiate SPORE client: $!" );
-    return $spore;
+has base_url => (
+    default => "https://api.pushover.net",
+    is      => 'ro',
+);
+
+has _urls => (
+    is => 'ro',
+    default => sub {
+        return {
+            messages => '/1/messages.json',
+            users    => '/1/users/validate.json',
+            receipts => '/1/receipts/$receipt$.json',
+            sounds   => '/1/sounds.json',
+        };
+    },
+);
+
+has api => (
+    is => 'lazy',
+);
+
+sub _build_api {
+    my ($self) = @_;
+    return WebService::Simple->new(
+        response_parser => WebService::Simple::Parser::JSON->new,
+        base_url        => $self->base_url,
+        debug           => $self->debug,
+    );
 }
 
 has specs => (
@@ -75,11 +87,6 @@ has specs => (
 sub _build_specs {
     my $self = shift();
     my $SPECS = {
-        format => {
-            type    => SCALAR,
-            regex   => qr/$REGEX_FORMAT/,
-            default => 'json',
-        },
         token => {
             type  => SCALAR,
             regex => qr/$REGEX_TOKEN/,
@@ -195,7 +202,6 @@ sub _build_specs {
     };
 
     my %messages_spec = (
-        format    => $SPECS->{format},
         token     => $SPECS->{token},
         user      => $SPECS->{user},
         device    => $SPECS->{device},
@@ -212,20 +218,17 @@ sub _build_specs {
     );
 
     my %users_spec = (
-        format => $SPECS->{format},
         token  => $SPECS->{token},
         user   => $SPECS->{user},
         device => $SPECS->{device},
     );
 
     my %receipts_spec = (
-        format  => $SPECS->{format},
         token   => $SPECS->{token},
         receipt => $SPECS->{receipt},
     );
 
     my %sounds_spec = (
-        format => $SPECS->{format},
         token  => $SPECS->{token},
     );
 
@@ -238,64 +241,58 @@ sub _build_specs {
 }
 
 sub _apicall {
-    my $self = shift;
-
-    my $call = shift;
+    my ($self, $method, $call, @rest) = @_;
 
     my $spec = $self->specs->{$call}
         or croak( "'$call' is not a supported API call." );
+    my $url    = $self->_urls->{$call}
+         or croak( "'$call' is not a supported API call." );
+    my $params = validate( @rest, $spec );
 
-    my $params = validate( @_, $spec );
-
-    my $response;
-    if ( defined( $params->{format} ) && $params->{format} eq 'json' ) {
-        $response = $self->spore->enable( 'Header', header_name => 'Content-Type', header_value => 'application/x-www-form-urlencoded' )->enable( 'Format::JSON' )->$call( %{$params} );
-    }
-    elsif ( defined( $params->{format} ) && $params->{format} eq 'xml' ){
-        $response = $self->spore->enable( 'Header', header_name => 'Content-Type', header_value => 'application/x-www-form-urlencoded' )->enable( 'Format::XML' )->$call( %{$params} );
-    }
-    else {
-        $response = $self->spore->$call( %{$params} );
+    while ($url =~ /\$(\S+?)\$/) {
+        my $arg = $1;
+        my $val = delete($params->{$arg}) || "";
+        $url =~ s/\$$arg\$/$val/g;
     }
 
-    return $response->body;
+    return $self->api->$method($url, $params)->parse_response;
 }
 
 sub message {
-    my $self = shift;
+    my ($self, %opts) = @_;
 
-    return $self->_apicall( 'messages',
+    return $self->_apicall(post => 'messages',
         user  => $self->user_token,
         token => $self->api_token,
-        @_
+        %opts,
     );
 }
 
 sub user {
-    my $self = shift;
+    my ($self, %opts) = @_;
 
-    return $self->_apicall( 'users', 
+    return $self->_apicall(post => 'users',
         user  => $self->user_token,
         token => $self->api_token,
-        @_
+        %opts,
     );
 }
 
 sub receipt {
-    my $self = shift;
+    my ($self, %opts) = @_;
 
-    return $self->_apicall( 'receipts',
+    return $self->_apicall(get => 'receipts',
         token => $self->api_token,
-        @_
+        %opts,
     );
 }
 
 sub sounds {
-    my $self = shift;
+    my ($self, %opts) = @_;
 
-    return $self->_apicall( 'sounds',
+    return $self->_apicall(get => 'sounds',
         token => $self->api_token,
-        @_
+        %opts,
     );
 }
 
@@ -363,9 +360,9 @@ are valid arguments; all are optional:
 
 =over 4
 
-=item debug B<OPTIONAL>
+=item base_url B<OPTIONAL>
 
-Set this to a true value in order to enable tracing of L<Net::HTTP::Spore> operations.
+Sets the base URL for the API to connect to. Defaults to L<http://api.pushover.net>
 
 =item user_token B<OPTIONAL>
 
@@ -376,6 +373,10 @@ If specified, will be used as a default in any call that requires a user token.
 
 The Pushover application token, obtained by registering at L<http://pushover.net/apps>.
 If specified, will be used as a default in any call that requires an API token.
+
+=item debug B<OPTIONAL>
+
+Set this to a true value in order to enable tracing of API call operations.
 
 =back
 
@@ -545,9 +546,9 @@ parsed from the JSON or XML response returned by the Pushover API.
 
 =item L<Moo>
 
-=item L<Net::HTTP::Spore>
+=item L<WebService::Simple>
 
-=item L<Net::HTTP::Spore::Middleware::Header>
+=item L<WebService::Simple::Parser::JSON>
 
 =item L<Params::Validate>
 

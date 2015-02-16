@@ -20,18 +20,28 @@ my $push;
 
 sub spin_mock_server
 {
-	$push = WebService::Pushover->new(@_);
 
 	$httpd = run_http_server {
 		my $request = shift;
 
 		my $data = {}; eval { $data = from_json($request->content) };
 
+		my $post_params = $request->decoded_content;
+		if ($post_params) {
+			for my $pair(split /&/, $post_params) {
+				my ($k, $v) = split /=/, $pair;
+				$data->{$k} = $v;
+			}
+		}
+
 		my $req_params = $request->uri->as_string;
-		$req_params =~ s/^.*\?//;
-		for my $pair (split /&/, $req_params) {
-			my ($k, $v) = split /=/, $pair;
-			$data->{$k} = $v;
+		if ($req_params =~ s/^.*\?//) {
+			if ($req_params) {
+				for my $pair (split /&/, $req_params) {
+					my ($k, $v) = split /=/, $pair;
+					$data->{$k} = $v;
+				}
+			}
 		}
 
 		my %headers = map { $_ => $request->headers->header($_) }
@@ -46,7 +56,7 @@ sub spin_mock_server
 		];
 	};
 
-	$push->spore->base_url($httpd->endpoint);
+	$push = WebService::Pushover->new(@_, base_url => $httpd->endpoint);
 
 }
 

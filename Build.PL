@@ -15,8 +15,8 @@ my $builder = Module::Build->new(
         'DateTime::Format::Strptime'           => 0,
         'File::Spec'                           => 0,
         'Moo'                                  => 0,
-        'Net::HTTP::Spore'                     => 0,
-        'Net::HTTP::Spore::Middleware::Header' => 0,
+        'WebService::Simple'                   => 0,
+        'WebService::Simple::Parser::JSON'     => 0,
         'Params::Validate'                     => 0,
         'Readonly'                             => 0,
         'URI'                                  => 0,
@@ -44,5 +44,4 @@ my $builder = Module::Build->new(
     create_makefile_pl => 'traditional',
 );
 
-$builder->add_build_element('json');
 $builder->create_build_script();
