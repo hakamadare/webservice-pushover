@@ -32,6 +32,7 @@ my $builder = Module::Build::Pluggable->new(
         'Test::Deep'          => 0,
         'Test::Fake::HTTPD'   => 0,
         'Test::More'          => 0,
+        'Class::Load'         => 0,
     },
     meta_merge => {
         resources => {
