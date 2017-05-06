@@ -571,7 +571,7 @@ Steve Huff  C<< <shuff@cpan.org> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2012, Steve Huff C<< <shuff@cpan.org> >>. All rights reserved.
+Copyright (c) 2012-2015, Steve Huff C<< <shuff@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
