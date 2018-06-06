@@ -26,8 +26,8 @@ Readonly my $REGEX_DEVICE => '^[A-Za-z0-9_-]{0,25}$';
 Readonly my $REGEX_NUMERIC => '^\d+$';
 Readonly my $REGEX_SOUNDS => '^(?:pushover|bike|bugle|cashregister|classical|cosmic|falling|gamelan|incoming|intermission|magic|mechanical|pianobar|siren|spacealarm|tugboat|alien|climb|persistent|echo|updown|none)$';
 
-Readonly my $SIZE_TITLE => 50;
-Readonly my $SIZE_MESSAGE => 512;
+Readonly my $SIZE_TITLE => 250;
+Readonly my $SIZE_MESSAGE => 1024;
 Readonly my $SIZE_URL => 200;
 Readonly my $SIZE_RETRY => 30;
 Readonly my $SIZE_EXPIRE => 86400;
